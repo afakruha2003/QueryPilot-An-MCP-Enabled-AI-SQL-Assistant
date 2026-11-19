@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppShell from './components/AppShell.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
@@ -22,6 +22,10 @@ export default function App() {
   const [activePage, setActivePage] = useState('Dashboard')
   const [loginMessage, setLoginMessage] = useState('')
   const Page = pages[activePage]
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [activePage, authenticated])
 
   if (!authenticated) {
     return (

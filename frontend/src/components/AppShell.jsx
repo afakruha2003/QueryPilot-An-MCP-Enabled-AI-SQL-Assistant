@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const groups = [
   {
     label: 'Workspace',
@@ -32,15 +34,30 @@ const descriptions = {
 }
 
 export default function AppShell({ activePage, onNavigate, onSignOut, children }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const navigateTo = (page) => {
+    onNavigate(page)
+    setMenuOpen(false)
+  }
+
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      {menuOpen && (
+        <button
+          className="drawer-backdrop"
+          onClick={() => setMenuOpen(false)}
+          aria-label="Close navigation menu"
+        />
+      )}
+
+      <aside className={`sidebar ${menuOpen ? 'is-open' : ''}`}>
         <a
           className="brand"
           href="#dashboard"
           onClick={(event) => {
             event.preventDefault()
-            onNavigate('Dashboard')
+            navigateTo('Dashboard')
           }}
           aria-label="QueryPilot dashboard"
         >
@@ -50,7 +67,14 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
             <small>Retail Intelligence</small>
           </span>
         </a>
-        <nav className="main-nav" aria-label="Main navigation">
+        <button
+          className="mobile-nav-close"
+          onClick={() => setMenuOpen(false)}
+          aria-label="Close navigation menu"
+        >
+          ×
+        </button>
+        <nav className="main-nav" id="main-navigation" aria-label="Main navigation">
           {groups.map((group) => (
             <div className="nav-group" key={group.label}>
               <p className="nav-caption">{group.label}</p>
@@ -58,7 +82,7 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
                 <button
                   className={`nav-item ${activePage === page ? 'active' : ''}`}
                   key={page}
-                  onClick={() => onNavigate(page)}
+                  onClick={() => navigateTo(page)}
                   aria-current={activePage === page ? 'page' : undefined}
                 >
                   <span className="nav-icon" aria-hidden="true">
@@ -91,7 +115,37 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
           <span className="status-dot" /> No active retail mapping
         </div>
       </aside>
-      <main className="main-content">
+      <main
+        className={`main-content ${activePage === 'AI assistant' ? 'assistant-mode' : ''}`}
+      >
+        <div className="mobile-app-bar">
+          <a
+            className="brand"
+            href="#dashboard"
+            onClick={(event) => {
+              event.preventDefault()
+              navigateTo('Dashboard')
+            }}
+            aria-label="QueryPilot dashboard"
+          >
+            <span className="brand-mark">SQL</span>
+            <span>
+              <strong>Sql Assistant</strong>
+              <small>Retail Intelligence</small>
+            </span>
+          </a>
+          <button
+            className="mobile-nav-toggle"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open navigation menu"
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
         <header className="page-header">
           <div>
             <p className="eyebrow">QUERY PILOT / {activePage.toUpperCase()}</p>
@@ -126,3 +180,4 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const quickQuestions = [
   'What were net sales last month?',
@@ -9,105 +9,142 @@ const quickQuestions = [
 
 export default function AssistantPage() {
   const [question, setQuestion] = useState('')
-  const [notice, setNotice] = useState('')
+  const [messages, setMessages] = useState([])
+  const conversationRef = useRef(null)
 
-  const ask = (value) => {
-    setQuestion(value)
-    setNotice(
-      'Assistant execution is unavailable until authentication, an approved dataset, and the read-only MCP service are connected.',
-    )
+  useEffect(() => {
+    const conversation = conversationRef.current
+
+    if (conversation) {
+      conversation.scrollTop = conversation.scrollHeight
+    }
+  }, [messages])
+
+  const sendQuestion = (value) => {
+    const text = value.trim()
+
+    if (!text) {
+      return
+    }
+
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      { role: 'user', text },
+      {
+        role: 'assistant',
+        text: 'I can’t query retail data in this preview. Connect authentication, an approved dataset, and the read-only MCP service to get an answer.',
+      },
+    ])
+    setQuestion('')
   }
 
   const clearConversation = () => {
+    setMessages([])
     setQuestion('')
-    setNotice('Conversation cleared. Chat history is not stored.')
-  }
-
-  const startNewConversation = () => {
-    setQuestion('')
-    setNotice('New conversation started.')
   }
 
   const submitQuestion = (event) => {
     event.preventDefault()
-
-    if (question.trim()) {
-      ask(question.trim())
-    }
+    sendQuestion(question)
   }
 
   return (
-    <div className="assistant-layout">
-      <section className="panel assistant-chat">
-        <div className="assistant-toolbar">
-          <div>
-            <h2>Ask your retail data</h2>
-            <p className="muted">Multilingual questions · read-only analysis</p>
+    <main className="assistant-page">
+      <section className="assistant-workspace">
+        <header className="assistant-toolbar">
+          <div className="assistant-title-group">
+            <span className="assistant-avatar" aria-hidden="true">
+              ✳
+            </span>
+            <div>
+              <h2>AI Assistant</h2>
+              <p className="muted">
+                Ask questions about your approved retail data.
+              </p>
+            </div>
+            <span className="assistant-ready-pill">
+              <span className="status-dot" /> Preview mode
+            </span>
           </div>
+
           <div className="toolbar-actions">
-            <button className="button button-secondary" onClick={clearConversation}>
-              Clear chat
+            <button
+              className="button button-secondary"
+              onClick={clearConversation}
+            >
+              Clear
             </button>
             <button
               className="button button-secondary"
-              onClick={startNewConversation}
+              onClick={clearConversation}
             >
               ＋ New chat
             </button>
           </div>
-        </div>
+        </header>
 
-        <div className="chat-empty">
-          <span className="assistant-avatar">✳</span>
-          <h3>What would you like to understand?</h3>
-          <p>
-            Your question will be checked against approved retail definitions
-            and relationships. SQL is never shown to business users.
-          </p>
-          <span className="empty-chat-tag">
-            No conversation history is stored
-          </span>
+        <div
+          className={`conversation ${messages.length ? 'has-messages' : ''}`}
+          aria-live="polite"
+          ref={conversationRef}
+        >
+          {messages.length === 0 ? (
+            <div className="conversation-welcome">
+              <span className="welcome-assistant-icon" aria-hidden="true">
+                ✳
+              </span>
+              <h3>How can I help you understand your retail data?</h3>
+              <p>
+                Ask a question in plain language. I’ll use approved business
+                definitions and read-only access to find an answer.
+              </p>
+              <span className="conversation-boundary">
+                No SQL is shown · Conversations aren’t saved
+              </span>
+            </div>
+          ) : (
+            <div className="message-list">
+              {messages.map((message, index) => (
+                <article
+                  className={`chat-message ${message.role}`}
+                  key={`${message.role}-${index}`}
+                >
+                  {message.role === 'assistant' && (
+                    <span className="message-avatar" aria-hidden="true">
+                      ✳
+                    </span>
+                  )}
+                  <div className="message-bubble">
+                    <span className="message-author">
+                      {message.role === 'user' ? 'You' : 'AI Assistant'}
+                    </span>
+                    <p>{message.text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
-
-        <div className="quick-questions">
-          <div className="panel-heading">
-            <h3>Quick questions</h3>
-            <span className="muted">Try a suggestion</span>
-          </div>
-          {quickQuestions.map((item) => (
-            <button
-              key={item}
-              className="quick-question"
-              onClick={() => ask(item)}
-            >
-              {item}
-              <span aria-hidden="true">↗</span>
-            </button>
-          ))}
-        </div>
-
-        {notice && (
-          <div className="form-message" role="status">
-            {notice}
-          </div>
-        )}
 
         <form className="chat-composer" onSubmit={submitQuestion}>
           <label className="sr-only" htmlFor="assistant-question">
-            Ask a question about retail data
+            Ask the AI assistant a question
           </label>
           <textarea
             id="assistant-question"
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Ask a question about your retail sales, orders, or products…"
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault()
+                sendQuestion(question)
+              }
+            }}
+            placeholder="Ask about sales, orders, or products…"
             rows="2"
           />
           <div className="composer-footer">
-            <span>
-              English and multilingual questions supported by the configured
-              model.
-            </span>
+            <span>Read-only analysis · SQL hidden · Shift + Enter for a new line</span>
             <button
               className="button button-primary"
               type="submit"
@@ -117,62 +154,39 @@ export default function AssistantPage() {
             </button>
           </div>
         </form>
+
+        <section className="quick-questions">
+          <div className="quick-questions-heading">
+            <div>
+              <p className="eyebrow">GET STARTED</p>
+              <h3>Quick questions</h3>
+            </div>
+            <span className="muted">Choose a prompt to start chatting</span>
+          </div>
+          <div className="quick-question-grid">
+            {quickQuestions.map((item) => (
+              <button
+                key={item}
+                className="quick-question"
+                onClick={() => sendQuestion(item)}
+              >
+                <span>{item}</span>
+                <span className="quick-question-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
       </section>
 
-      <aside className="assistant-side">
-        <section className="panel">
-          <div className="panel-heading">
-            <div>
-              <h3>Request status</h3>
-              <p className="muted">Processing stages</p>
-            </div>
-            <span className="status-pill status-idle">Idle</span>
-          </div>
-          <ol className="stage-list">
-            <li>
-              <span>1</span>
-              <div>
-                <strong>Validate access</strong>
-                <small>Waiting for sign-in</small>
-              </div>
-            </li>
-            <li>
-              <span>2</span>
-              <div>
-                <strong>Resolve meaning</strong>
-                <small>Requires active mapping</small>
-              </div>
-            </li>
-            <li>
-              <span>3</span>
-              <div>
-                <strong>Run safe query</strong>
-                <small>Read-only MCP unavailable</small>
-              </div>
-            </li>
-            <li>
-              <span>4</span>
-              <div>
-                <strong>Present results</strong>
-                <small>No results returned</small>
-              </div>
-            </li>
-          </ol>
-          <button className="button button-secondary cancel-button" disabled>
-            Cancel request
-          </button>
-        </section>
-
-        <section className="panel safety-panel">
-          <h3>Safe and transparent answers</h3>
-          <ul>
-            <li>Ambiguous questions prompt for clarification.</li>
-            <li>Unsupported data is reported as unavailable.</li>
-            <li>Queries run with read-only permissions and limits.</li>
-            <li>New Chat and Clear Chat reset conversation context.</li>
-          </ul>
-        </section>
-      </aside>
-    </div>
+      <div className="assistant-safety-note">
+        <span aria-hidden="true">♧</span>
+        <p>
+          The assistant has read-only access. Questions and results stay in this
+          temporary conversation and aren’t saved in preview mode.
+        </p>
+      </div>
+    </main>
   )
 }
