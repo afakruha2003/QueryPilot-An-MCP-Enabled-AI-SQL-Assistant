@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SiteFooter from './SiteFooter.jsx'
 
 const groups = [
   {
@@ -193,10 +194,7 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
           </div>
         )}
         {children}
-        <footer className="page-footer">
-          <span>QueryPilot · Retail intelligence</span>
-          <span>Sample UI only · no live data</span>
-        </footer>
+        <SiteFooter />
       </main>
     </div>
   )

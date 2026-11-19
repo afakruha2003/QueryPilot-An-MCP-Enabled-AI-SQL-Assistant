@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SiteFooter from '../components/SiteFooter.jsx'
 
 export default function LoginPage({ onPreview, onSignIn, message }) {
   const [showPassword, setShowPassword] = useState(false)
@@ -96,9 +97,7 @@ export default function LoginPage({ onPreview, onSignIn, message }) {
         </section>
       </div>
 
-      <footer className="login-footer">
-        Sql Assistant · Epoch N Retail Analytics Platform
-      </footer>
+      <SiteFooter />
     </main>
   )
 }
