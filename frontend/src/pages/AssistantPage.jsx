@@ -101,16 +101,26 @@ export default function AssistantPage({ darkMode, onToggleTheme }) {
                 </svg>
               </button>
               <button
-                className="button button-secondary"
+                className="button button-secondary clear-chat-button"
                 onClick={clearConversation}
+                aria-label="Clear conversation"
+                title="Clear conversation"
               >
-                Clear
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+                </svg>
+                <span className="action-label">Clear</span>
               </button>
               <button
-                className="button button-secondary"
+                className="button button-secondary new-chat-button"
                 onClick={clearConversation}
+                aria-label="New chat"
+                title="New chat"
               >
-                ＋ New chat
+                <span className="action-label">New chat</span>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
               </button>
             </div>
           </header>

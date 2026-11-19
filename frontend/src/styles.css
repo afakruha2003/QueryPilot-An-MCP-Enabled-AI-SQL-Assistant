@@ -16,7 +16,7 @@
 }
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
 }
 button, a {
@@ -1451,6 +1451,23 @@ td {
   padding-inline: 9px;
   font-size: 9px;
 }
+.toolbar-actions .clear-chat-button,
+.toolbar-actions .new-chat-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.clear-chat-button svg,
+.new-chat-button svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .chat-empty {
   display: grid;
   justify-items: center;
@@ -1923,6 +1940,14 @@ td {
     background: rgb(245 248 246 / 96%);
     backdrop-filter: blur(8px);
   }
+  .mobile-app-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .main-content .page-header .header-actions .theme-toggle,
+  .assistant-toolbar .theme-toggle { display: none; }
+  .main-content:not(.dashboard-mode) .page-header .header-actions { display: none; }
   .mobile-app-bar .brand {
     padding: 0;
   }
@@ -2451,13 +2476,16 @@ html[data-theme='dark'] {
   --muted: #8b9a92;
   --line: #262e2a;
   --surface: #141917;
-  background-color: #1a211d;
+  background-color: #222424;
   color: #f8faf9;
 }
 html[data-theme='dark'] body,
 html[data-theme='dark'] .login-page,
 html[data-theme='dark'] .main-content,
-html[data-theme='dark'] .app-shell { background: #1a211d; color: #f8faf9; }
+html[data-theme='dark'] .app-shell { background: #222424; color: #f8faf9; }
+html:not([data-theme='dark']) body,
+html:not([data-theme='dark']) .main-content,
+html:not([data-theme='dark']) .app-shell { background-color: #f5f8f6; }
 html[data-theme='dark'] .sidebar,
 html[data-theme='dark'] .panel,
 html[data-theme='dark'] .metric-card,
@@ -2574,7 +2602,7 @@ html[data-theme='dark'] .coming-icon,
 html[data-theme='dark'] .empty-form-icon { background: #18382c; color: #34d399; border-color: #262e2a; }
 html[data-theme='dark'] .quick-questions-heading .eyebrow { color: #f5b041; }
 html[data-theme='dark'] .metric-value.unavailable { color: #8b9a92; }
-html[data-theme='dark'] .mobile-app-bar { background: rgb(20 25 23 / 96%); border-color: #262e2a; }
+html[data-theme='dark'] .mobile-app-bar { background: rgb(34 36 36 / 96%); border-color: #2b2d2d; }
 html[data-theme='dark'] .mobile-nav-toggle { background: #1b221f; border-color: #34403a; }
 html[data-theme='dark'] .mobile-nav-toggle span { background: #e2e8e4; }
 
@@ -2613,6 +2641,7 @@ html, body, .app-shell, .main-content, .sidebar, .site-footer,
   .panel, .metric-card, .login-card, .welcome-card, .theme-toggle,
   .nav-item, input, select, textarea, .button-secondary { transition: none; }
 }
+html.theme-changing,
 html.theme-changing *,
 html.theme-changing *::before,
 html.theme-changing *::after {
@@ -2621,6 +2650,7 @@ html.theme-changing *::after {
   transition-timing-function: cubic-bezier(.22, .61, .36, 1) !important;
 }
 @media (prefers-reduced-motion: reduce) {
+  html.theme-changing,
   html.theme-changing *,
   html.theme-changing *::before,
   html.theme-changing *::after { transition-duration: .01ms !important; }
@@ -2656,4 +2686,129 @@ html[data-theme='dark'] .assistant-page .chat-composer .button-primary:not(:disa
 html[data-theme='dark'] .assistant-page .chat-composer .button-primary:not(:disabled):hover {
   border-color: #6ee7b7;
   background: #6ee7b7;
+}
+html[data-theme='dark'] .assistant-avatar {
+  border-color: transparent;
+  background: transparent;
+  color: #34d399;
+}
+html[data-theme='dark'] .sidebar {
+  border-color: #292b2b;
+  background-color: #1c1e1e;
+}
+@media (max-width: 680px) {
+  body,
+  #root,
+  .app-shell,
+  .login-page,
+  .main-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .page-header > div:first-child,
+  .page-header .header-actions {
+    width: 100%;
+    min-width: 0;
+  }
+  .page-header .muted { max-width: none; }
+  .login-center,
+  .login-card { width: 100%; min-width: 0; }
+  .login-card { padding: 22px 20px; }
+  .login-card > .muted,
+  .session-notice p,
+  .login-footnote { font-size: 12px; line-height: 1.55; }
+  .login-card .field-label { font-size: 12px; }
+  .login-card input { min-height: 44px; font-size: 14px; }
+  .login-card .password-input button { height: 44px; font-size: 12px; }
+  .login-card .sign-in-button,
+  .login-card .preview-link { min-height: 44px; font-size: 12px; }
+  .section-heading,
+  .panel-heading,
+  .form-heading { min-width: 0; }
+  .metric-label { font-size: 11px; }
+  .metric-foot { font-size: 11px; line-height: 1.4; }
+  .main-content > *,
+  .login-page > *,
+  .login-center > *,
+  .assistant-toolbar > *,
+  .section-heading > *,
+  .panel-heading > * { min-width: 0; }
+  .mobile-app-bar .brand { flex: 1; min-width: 0; }
+  .mobile-app-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-app-actions .theme-toggle {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+  }
+  .mobile-app-actions .mobile-nav-toggle { flex: 0 0 39px; }
+  .main-content .page-header .header-actions .theme-toggle,
+  .assistant-toolbar .theme-toggle { display: none; }
+  .main-content:not(.dashboard-mode) .page-header .header-actions { display: none; }
+  .assistant-toolbar {
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .assistant-title-group {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    min-width: 0;
+  }
+  .assistant-title-group .assistant-avatar {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+  }
+  .assistant-title-group > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .assistant-title-group h2 { margin: 0; font-size: 15px; }
+  .assistant-title-group .muted,
+  .assistant-title-group .assistant-ready-pill { display: none; }
+  .assistant-title-group .assistant-ready-pill {
+    margin: 0;
+  }
+  .toolbar-actions .action-label { display: none; }
+  .toolbar-actions {
+    flex: 0 0 auto;
+    width: auto;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .toolbar-actions .clear-chat-button {
+    display: grid;
+    flex: 0 0 32px;
+    width: 32px;
+    min-height: 32px;
+    place-items: center;
+    padding: 0;
+  }
+  .toolbar-actions .new-chat-button {
+    display: grid;
+    flex: 0 0 32px;
+    width: 32px;
+    min-height: 32px;
+    place-items: center;
+    padding: 0;
+  }
+  .clear-chat-button svg,
+  .new-chat-button svg { width: 15px; height: 15px; }
 }
