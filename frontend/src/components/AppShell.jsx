@@ -25,7 +25,8 @@ const icons = {
 }
 
 const descriptions = {
-  Dashboard: 'Retail performance at a glance',
+  Dashboard:
+    'Live business intelligence and sales transaction KPIs across approved PostgreSQL retail tables.',
   'Retail data': 'Explore permitted retail transactions and records.',
   'AI assistant': 'Ask questions about approved retail data in plain language.',
   'Retail record forms': 'Add or update records through approved business forms.',
@@ -33,12 +34,23 @@ const descriptions = {
   'Business audit records': 'Review authorized business changes and account actions.',
 }
 
+const pageTitles = {
+  Dashboard: 'Retail Performance Dashboard',
+  'Retail data': 'Retail Data Browsing',
+  'AI assistant': 'AI Assistant',
+  'Retail record forms': 'Retail Record Management',
+  'Employee management': 'Employee Management',
+  'Business audit records': 'Business Audit Records',
+}
+
 export default function AppShell({ activePage, onNavigate, onSignOut, children }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [exportMessage, setExportMessage] = useState('')
 
   const navigateTo = (page) => {
     onNavigate(page)
     setMenuOpen(false)
+    setExportMessage('')
   }
 
   return (
@@ -116,7 +128,7 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
         </div>
       </aside>
       <main
-        className={`main-content ${activePage === 'AI assistant' ? 'assistant-mode' : ''}`}
+        className={`main-content ${activePage === 'AI assistant' ? 'assistant-mode' : ''} ${activePage === 'Dashboard' ? 'dashboard-mode' : ''}`}
       >
         <div className="mobile-app-bar">
           <a
@@ -149,28 +161,37 @@ export default function AppShell({ activePage, onNavigate, onSignOut, children }
         <header className="page-header">
           <div>
             <p className="eyebrow">QUERY PILOT / {activePage.toUpperCase()}</p>
-            <h1>{activePage}</h1>
+            <h1>{pageTitles[activePage]}</h1>
             <p className="muted">{descriptions[activePage]}</p>
           </div>
           <div className="header-actions">
-            <span className="preview-pill">Preview mode</span>
             {activePage === 'Dashboard' && (
-              <button
-                className="button button-primary"
-                onClick={() => onNavigate('AI assistant')}
-              >
-                Ask AI assistant <span aria-hidden="true">↗</span>
-              </button>
+              <>
+                <button
+                  className="button button-secondary"
+                  onClick={() => navigateTo('AI assistant')}
+                >
+                  ▤ &nbsp; Ask AI Assistant
+                </button>
+                <button
+                  className="button button-primary"
+                  onClick={() =>
+                    setExportMessage(
+                      'PDF export is not connected in UI preview mode.',
+                    )
+                  }
+                >
+                  ▣ &nbsp; Export Report (PDF)
+                </button>
+              </>
             )}
           </div>
         </header>
-        <div className="preview-banner">
-          <strong>Design preview</strong>
-          <span>
-            Actions are not saved. Sign-in, database access, and live data are
-            not connected.
-          </span>
-        </div>
+        {exportMessage && (
+          <div className="export-preview-message" role="status">
+            {exportMessage}
+          </div>
+        )}
         {children}
         <footer className="page-footer">
           <span>QueryPilot · Retail intelligence</span>
